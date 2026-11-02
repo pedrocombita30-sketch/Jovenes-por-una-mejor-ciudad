@@ -1,0 +1,35 @@
+# Dependencias
+node_modules/
+
+# Builds
+dist/
+build/
+
+# Base de datos local
+*.db
+*.db-journal
+
+# Variables de entorno
+.env
+.env.local
+.env.production
+
+# Uploads locales
+backend/src/uploads/documents/*
+backend/src/uploads/images/*
+!backend/src/uploads/documents/.gitkeep
+!backend/src/uploads/images/.gitkeep
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Scripts personales de esta máquina (rutas locales de OneDrive)
+sincronizar-copia.ps1
+sincronizar-copia.cmd

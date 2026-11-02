@@ -1,0 +1,344 @@
+// Prisma schema para Jóvenes por una Mejor Ciudad
+// SQLite para desarrollo. Cambiar provider a "postgresql" para producción.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ========== MODELOS ==========
+
+model Role {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+  users       User[]
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  phone     String?
+  roleId    Int
+  role      Role     @relation(fields: [roleId], references: [id])
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  clientsAssigned   Client[]        @relation("AssignedClients")
+  clientsCreated    Client[]        @relation("CreatedClients")
+  interactions      Interaction[]
+  followUps         FollowUp[]
+  activities        Activity[]
+  participants      Participant[]
+  resources         Resource[]
+  conversations     Conversation[]  @relation("UserConversations")
+  escalatedChats    Conversation[]  @relation("EscalatedConversations")
+  notifications     Notification[]
+  corporateDocs     CorporateDocument[]
+  coursesCreated    Course[]
+  enrollments       Enrollment[]
+  enrollmentsReviewed Enrollment[] @relation("EnrollmentReviewers")
+  resourceProgress  ResourceProgress[]
+  quizAttempts      QuizAttempt[]
+}
+
+model Client {
+  id         Int      @id @default(autoincrement())
+  firstName  String
+  lastName   String
+  email      String?
+  phone      String?
+  address    String?
+  birthDate  String?
+  status     String   @default("NUEVO")
+  notes      String?
+  assignedTo Int?
+  assignedUser User?  @relation("AssignedClients", fields: [assignedTo], references: [id])
+  createdBy  Int
+  creator    User     @relation("CreatedClients", fields: [createdBy], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  interactions Interaction[]
+  followUps    FollowUp[]
+}
+
+model Interaction {
+  id          Int      @id @default(autoincrement())
+  clientId    Int
+  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  type        String   @default("OTRO")
+  description String
+  createdAt   DateTime @default(now())
+}
+
+model FollowUp {
+  id          Int      @id @default(autoincrement())
+  clientId    Int
+  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  status      String   @default("PENDIENTE")
+  description String
+  dueDate     String?
+  completedAt String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Activity {
+  id              Int      @id @default(autoincrement())
+  title           String
+  description     String?
+  type            String
+  startDate       DateTime
+  endDate         DateTime?
+  location        String?
+  imageUrl        String?
+  modality        String   @default("PRESENCIAL")
+  status          String   @default("PROGRAMADA")
+  maxParticipants Int?
+  createdBy       Int
+  creator         User     @relation(fields: [createdBy], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  participants Participant[]
+  resources    Resource[]
+}
+
+model Participant {
+  id         Int      @id @default(autoincrement())
+  activityId Int
+  activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
+  status     String   @default("REGISTRADO")
+  createdAt  DateTime @default(now())
+
+  @@unique([activityId, userId])
+}
+
+model Resource {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  type        String
+  fileUrl     String?
+  externalUrl String?
+  activityId  Int?
+  activity    Activity? @relation(fields: [activityId], references: [id], onDelete: SetNull)
+  courseId    Int?
+  course      Course?   @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  moduleId    Int?
+  module      CourseModule? @relation(fields: [moduleId], references: [id], onDelete: SetNull)
+  uploadedBy  Int
+  uploader    User      @relation(fields: [uploadedBy], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  progress    ResourceProgress[]
+
+  @@index([moduleId])
+}
+
+model Course {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  duration    String?
+  modality    String   @default("PRESENCIAL")
+  imageUrl    String?
+  active      Boolean  @default(true)
+  createdBy   Int
+  creator     User     @relation(fields: [createdBy], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  enrollments Enrollment[]
+  resources   Resource[]
+  modules     CourseModule[]
+
+  @@index([active])
+}
+
+// Cada curso tiene exactamente tres módulos (position 1, 2 y 3).
+// No existen endpoints para crear ni eliminar módulos.
+model CourseModule {
+  id          Int      @id @default(autoincrement())
+  courseId    Int
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  position    Int
+  title       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  resources   Resource[]
+  quiz        Quiz?
+
+  @@unique([courseId, position])
+}
+
+model ResourceProgress {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resourceId  Int
+  resource    Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  courseId    Int
+  completedAt DateTime @default(now())
+
+  @@unique([userId, resourceId])
+  @@index([courseId, userId])
+}
+
+model Quiz {
+  id           Int      @id @default(autoincrement())
+  moduleId     Int      @unique
+  module       CourseModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  title        String
+  instructions String?
+  passingScore Int      @default(70)
+  updatedAt    DateTime @updatedAt
+
+  questions    QuizQuestion[]
+  attempts     QuizAttempt[]
+}
+
+model QuizQuestion {
+  id       Int      @id @default(autoincrement())
+  quizId   Int
+  quiz     Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  text     String
+  position Int      @default(0)
+
+  options  QuizOption[]
+
+  @@index([quizId])
+}
+
+model QuizOption {
+  id         Int          @id @default(autoincrement())
+  questionId Int
+  question   QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  text       String
+  isCorrect  Boolean      @default(false)
+  position   Int          @default(0)
+
+  @@index([questionId])
+}
+
+model QuizAttempt {
+  id             Int      @id @default(autoincrement())
+  quizId         Int
+  quiz           Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  userId         Int
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId       Int
+  score          Int
+  correctCount   Int
+  totalQuestions Int
+  passed         Boolean
+  createdAt      DateTime @default(now())
+
+  @@index([quizId, userId])
+  @@index([courseId, userId])
+}
+
+model Enrollment {
+  id          Int      @id @default(autoincrement())
+  courseId    Int
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status      String   @default("PENDIENTE")
+  notes       String?
+  reviewedBy  Int?
+  reviewer    User?    @relation("EnrollmentReviewers", fields: [reviewedBy], references: [id])
+  reviewedAt  DateTime?
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([courseId, userId])
+  @@index([status])
+}
+
+model Conversation {
+  id         Int      @id @default(autoincrement())
+  userId     Int?
+  user       User?    @relation("UserConversations", fields: [userId], references: [id], onDelete: SetNull)
+  status     String   @default("ACTIVA")
+  assignedTo Int?
+  assignedCollaborator User? @relation("EscalatedConversations", fields: [assignedTo], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  messages      Message[]
+  notifications Notification[]
+}
+
+model Message {
+  id             Int          @id @default(autoincrement())
+  conversationId Int
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         String
+  content        String
+  createdAt      DateTime     @default(now())
+}
+
+model ContentPage {
+  id        Int      @id @default(autoincrement())
+  slug      String   @unique
+  title     String
+  content   String?
+  imageUrl  String?
+  updatedAt DateTime @updatedAt
+}
+
+model ChatbotKnowledge {
+  id       Int     @id @default(autoincrement())
+  keywords String
+  question String
+  answer   String
+  active   Boolean @default(true)
+}
+
+model Notification {
+  id             Int      @id @default(autoincrement())
+  userId         Int
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type           String
+  message        String
+  isRead         Boolean  @default(false)
+  conversationId Int?
+  conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+}
+
+model CorporateDocument {
+  id           Int      @id @default(autoincrement())
+  title        String
+  description  String?
+  fileUrl      String
+  originalName String?
+  fileType     String?
+  fileSize     Int?
+  uploadedBy   Int
+  uploader     User     @relation(fields: [uploadedBy], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([createdAt])
+}

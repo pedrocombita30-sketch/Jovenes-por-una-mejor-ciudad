@@ -1,41 +1,41 @@
-# Jóvenes por una Mejor Ciudad — Sistema de Gestión Integral
+﻿# JÃ³venes por una Mejor Ciudad â€” Sistema de GestiÃ³n Integral
 
-Sistema web completo para la organización **"Jóvenes por una Mejor Ciudad"**. Integra una **página web pública**, un **CRM de clientes**, un **chatbot con inteligencia artificial**, un **módulo de cursos con inscripciones** y un **panel administrativo** con control de contenido.
+Sistema web completo para la organizaciÃ³n **"JÃ³venes por una Mejor Ciudad"**. Integra una **pÃ¡gina web pÃºblica**, un **CRM de clientes**, un **chatbot con inteligencia artificial**, un **mÃ³dulo de cursos con inscripciones** y un **panel administrativo** con control de contenido.
 
-## Descripción del proyecto
+## DescripciÃ³n del proyecto
 
-La plataforma publica la información de la organización, administra clientes con interacciones y seguimientos, ofrece cursos con inscripción y aula extendida de materiales, y atiende de forma automatizada mediante un chatbot con base de conocimientos administrable.
+La plataforma publica la informaciÃ³n de la organizaciÃ³n, administra clientes con interacciones y seguimientos, ofrece cursos con inscripciÃ³n y aula extendida de materiales, y atiende de forma automatizada mediante un chatbot con base de conocimientos administrable.
 
-### Módulos principales
+### MÃ³dulos principales
 
-| Módulo | Descripción |
+| MÃ³dulo | DescripciÃ³n |
 |---|---|
-| **Página web pública** | Inicio, Quiénes somos, Temas, Actividades, Cursos, Información corporativa y Contacto. Contenido administrable desde el panel. |
-| **Autenticación y roles** | Registro y login con JWT. Roles: Administrador, Colaborador y Usuario/Cliente con control de acceso por rol. |
-| **Cursos e inscripciones** | Catálogo público, inscripción con aprobación por colaborador, cancelación y aula virtual con 3 módulos, progreso y cuestionarios. |
-| **CRM** | Fichas de clientes, búsqueda y filtros, interacciones, seguimientos, asignación de responsables y estados personalizables. |
-| **Chatbot con IA** | Atención automática con base de conocimientos, contexto conversacional, historial y escalamiento a colaboradores. Modo mock sin API. |
-| **Información corporativa** | Documentos oficiales de la fundación con descarga pública. |
-| **Contenido web (CMS)** | Textos de las páginas, imágenes de temas y actividades realizadas, editables desde el panel. |
-| **Panel administrativo** | Dashboard con estadísticas, gestión de usuarios, clientes, cursos, inscripciones, materiales, conversaciones y contenido. |
+| **PÃ¡gina web pÃºblica** | Inicio, QuiÃ©nes somos, Temas, Actividades, Cursos, InformaciÃ³n corporativa y Contacto. Contenido administrable desde el panel. |
+| **AutenticaciÃ³n y roles** | Registro y login con JWT. Roles: Administrador, Colaborador y Usuario/Cliente con control de acceso por rol. |
+| **Cursos e inscripciones** | CatÃ¡logo pÃºblico, inscripciÃ³n con aprobaciÃ³n por colaborador, cancelaciÃ³n y aula virtual con 3 mÃ³dulos, progreso y cuestionarios. |
+| **CRM** | Fichas de clientes, bÃºsqueda y filtros, interacciones, seguimientos, asignaciÃ³n de responsables y estados personalizables. |
+| **Chatbot con IA** | AtenciÃ³n automÃ¡tica con base de conocimientos, contexto conversacional, historial y escalamiento a colaboradores. Modo mock sin API. |
+| **InformaciÃ³n corporativa** | Documentos oficiales de la fundaciÃ³n con descarga pÃºblica. |
+| **Contenido web (CMS)** | Textos de las pÃ¡ginas, imÃ¡genes de temas y actividades realizadas, editables desde el panel. |
+| **Panel administrativo** | Dashboard con estadÃ­sticas, gestiÃ³n de usuarios, clientes, cursos, inscripciones, materiales, conversaciones y contenido. |
 
-## Tecnologías utilizadas
+## TecnologÃ­as utilizadas
 
 ### Frontend
 - **React 18** + **Vite**
-- **Tailwind CSS** (diseño responsive)
+- **Tailwind CSS** (diseÃ±o responsive)
 - **React Router v6**
 - **Axios**
 
 ### Backend
 - **Node.js** + **Express**
 - **Prisma ORM**
-- **JWT** (autenticación) + **bcrypt** (hash de contraseñas)
+- **JWT** (autenticaciÃ³n) + **bcrypt** (hash de contraseÃ±as)
 - **Multer** (carga de archivos)
 
 ### Base de datos
 - **SQLite** en desarrollo (`backend/prisma/dev.db`)
-- Listo para **PostgreSQL** en producción (cambiar `provider` en `schema.prisma`)
+- Listo para **PostgreSQL** en producciÃ³n (cambiar `provider` en `schema.prisma`)
 
 ## Requisitos para ejecutar el proyecto
 
@@ -43,7 +43,7 @@ La plataforma publica la información de la organización, administra clientes c
 - **npm** 9 o superior
 - No requiere PostgreSQL instalado (usa SQLite por defecto)
 
-## Instalación
+## InstalaciÃ³n
 
 ```bash
 # 1. Clonar o copiar el proyecto
@@ -56,9 +56,9 @@ cd ../frontend
 npm install
 ```
 
-En Windows también puedes ejecutar `levantar-sistema.cmd` en la raíz: instala dependencias si faltan, compila el panel y arranca el servidor en http://localhost:3001.
+En Windows tambiÃ©n puedes ejecutar `levantar-sistema.cmd` en la raÃ­z: instala dependencias si faltan, compila el panel y arranca el servidor en http://localhost:3001.
 
-## Configuración de variables de entorno
+## ConfiguraciÃ³n de variables de entorno
 
 ### Backend (`backend/.env`)
 
@@ -79,14 +79,14 @@ NODE_ENV=development
 # CORS (URL del frontend)
 FRONTEND_URL="http://localhost:5173"
 
-# IA — opcional. Sin clave, el chatbot usa modo mock automáticamente.
+# IA â€” opcional. Sin clave, el chatbot usa modo mock automÃ¡ticamente.
 OPENAI_API_KEY=""
 AI_MODEL="gpt-3.5-turbo"
 ```
 
-> **Nota:** Si se configura `OPENAI_API_KEY`, el chatbot usará la IA real de OpenAI. Sin ella, funciona en **modo mock** con la base de conocimientos administrable desde el panel.
+> **Nota:** Si se configura `OPENAI_API_KEY`, el chatbot usarÃ¡ la IA real de OpenAI. Sin ella, funciona en **modo mock** con la base de conocimientos administrable desde el panel.
 
-## Configuración de la base de datos
+## ConfiguraciÃ³n de la base de datos
 
 ```bash
 cd backend
@@ -105,8 +105,8 @@ Para SQLite/desarrollo es suficiente `npx prisma db push`. Para usar migraciones
 npx prisma migrate dev --name init
 ```
 
-El módulo de cursos por módulos incluye un script de migración de datos que crea los tres
-módulos y sus cuestionarios en cada curso existente y asigna los materiales al Módulo 1:
+El mÃ³dulo de cursos por mÃ³dulos incluye un script de migraciÃ³n de datos que crea los tres
+mÃ³dulos y sus cuestionarios en cada curso existente y asigna los materiales al MÃ³dulo 1:
 
 ```bash
 cd backend
@@ -115,7 +115,7 @@ npm run db:migrate:courses
 
 Es idempotente: puede ejecutarse varias veces sin duplicar registros.
 
-Para producción con **PostgreSQL**, cambiar en `backend/prisma/schema.prisma`:
+Para producciÃ³n con **PostgreSQL**, cambiar en `backend/prisma/schema.prisma`:
 
 ```prisma
 datasource db {
@@ -126,7 +126,7 @@ datasource db {
 
 Y actualizar `DATABASE_URL` en `.env` (ej. `postgresql://user:pass@localhost:5432/jovenes_ciudad`), luego ejecutar `npx prisma migrate deploy`.
 
-## Cómo iniciar frontend y backend
+## CÃ³mo iniciar frontend y backend
 
 ### Backend (terminal 1)
 
@@ -141,97 +141,87 @@ npm run dev
 ```bash
 cd frontend
 npm run dev
-# Aplicación disponible en http://localhost:5173
+# AplicaciÃ³n disponible en http://localhost:5173
 ```
 
-El frontend usa un proxy que reenvía `/api` y `/uploads` al backend, por lo que no requiere configuración adicional en desarrollo.
+El frontend usa un proxy que reenvÃ­a `/api` y `/uploads` al backend, por lo que no requiere configuraciÃ³n adicional en desarrollo.
 
-En producción, compila el panel (`npm run build` en `frontend/`) y sirve `frontend/dist` desde el backend: la misma URL (puerto 3001) entrega sitio y API.
-
-## Usuarios de prueba
-
-El `seed.js` crea estos usuarios:
-
-| Rol | Correo | Contraseña |
-|---|---|---|
-| **Administrador** | `admin@jovenes-ciudad.org` | `Admin123!` |
-| **Colaborador** | `colaborador@jovenes-ciudad.org` | `Admin123!` |
-| **Usuario/Cliente** | `usuario@example.com` | `Admin123!` |
+En producciÃ³n, compila el panel (`npm run build` en `frontend/`) y sirve `frontend/dist` desde el backend: la misma URL (puerto 3001) entrega sitio y API.
 
 ### Permisos por rol
 
-| Acción | Admin | Colaborador | Usuario/Cliente |
+| AcciÃ³n | Admin | Colaborador | Usuario/Cliente |
 |---|---|---|---|
-| Panel de gestión | ✅ | ✅ | ❌ |
-| Gestionar usuarios del sistema | ✅ | Ver solamente | ❌ |
-| Crear/editar clientes | ✅ | ✅ | ❌ |
-| Interacciones y seguimientos | ✅ | ✅ | ❌ |
-| Crear/editar cursos y materiales | ✅ | ✅ | ❌ |
-| Aprobar/rechazar inscripciones | ✅ | ✅ | ❌ |
-| Administrar contenido web y chatbot | ✅ | ❌ | ❌ |
-| Inscribirse en cursos | ✅ | ✅ | ✅ |
-| Usar el chatbot | ✅ | ✅ | ✅ |
+| Panel de gestiÃ³n | âœ… | âœ… | âŒ |
+| Gestionar usuarios del sistema | âœ… | Ver solamente | âŒ |
+| Crear/editar clientes | âœ… | âœ… | âŒ |
+| Interacciones y seguimientos | âœ… | âœ… | âŒ |
+| Crear/editar cursos y materiales | âœ… | âœ… | âŒ |
+| Aprobar/rechazar inscripciones | âœ… | âœ… | âŒ |
+| Administrar contenido web y chatbot | âœ… | âŒ | âŒ |
+| Inscribirse en cursos | âœ… | âœ… | âœ… |
+| Usar el chatbot | âœ… | âœ… | âœ… |
 
 ## Estructura general del proyecto
 
 ```
 jovenes-ciudad/
-├── backend/                      # API REST
-│   ├── prisma/
-│   │   ├── schema.prisma         # Modelo de datos
-│   │   └── seed.js               # Datos iniciales
-│   ├── src/
-│   │   ├── config/               # Configuración (Prisma client)
-│   │   ├── controllers/          # Lógica de cada módulo
-│   │   ├── middleware/           # Auth, roles, validación, errores
-│   │   ├── routes/               # Definición de rutas REST
-│   │   ├── services/             # Servicio de IA (mock + OpenAI)
-│   │   ├── uploads/              # Archivos subidos
-│   │   └── utils/                # Helpers y constantes
-│   └── .env.example
-├── frontend/                     # Aplicación React
-│   ├── public/
-│   └── src/
-│       ├── api/                  # Cliente Axios
-│       ├── components/
-│       │   ├── auth/             # Rutas protegidas
-│       │   ├── chatbot/          # Widget del chatbot
-│       │   ├── layout/           # Navbar, Footer, Sidebar, AdminLayout
-│       │   └── ui/               # Componentes reutilizables (Alertas, Tablas, Modales...)
-│       ├── context/              # Contexto de autenticación
-│       ├── pages/
-│       │   ├── admin/            # Dashboard, CRM, cursos, recursos, chat, contenido
-│       │   ├── auth/             # Login y registro
-│       │   └── public/           # Páginas del sitio público
-│       ├── App.jsx               # Definición de rutas
-│       └── main.jsx              # Punto de entrada
-├── levantar-sistema.cmd          # Arranque de un paso (Windows)
-└── reconstruir-panel.cmd         # Recompila el frontend tras editar código
+â”œâ”€â”€ backend/                      # API REST
+â”‚   â”œâ”€â”€ prisma/
+â”‚   â”‚   â”œâ”€â”€ schema.prisma         # Modelo de datos
+â”‚   â”‚   â””â”€â”€ seed.js               # Datos iniciales
+â”‚   â”œâ”€â”€ src/
+â”‚   â”‚   â”œâ”€â”€ config/               # ConfiguraciÃ³n (Prisma client)
+â”‚   â”‚   â”œâ”€â”€ controllers/          # LÃ³gica de cada mÃ³dulo
+â”‚   â”‚   â”œâ”€â”€ middleware/           # Auth, roles, validaciÃ³n, errores
+â”‚   â”‚   â”œâ”€â”€ routes/               # DefiniciÃ³n de rutas REST
+â”‚   â”‚   â”œâ”€â”€ services/             # Servicio de IA (mock + OpenAI)
+â”‚   â”‚   â”œâ”€â”€ uploads/              # Archivos subidos
+â”‚   â”‚   â””â”€â”€ utils/                # Helpers y constantes
+â”‚   â””â”€â”€ .env.example
+â”œâ”€â”€ frontend/                     # AplicaciÃ³n React
+â”‚   â”œâ”€â”€ public/
+â”‚   â””â”€â”€ src/
+â”‚       â”œâ”€â”€ api/                  # Cliente Axios
+â”‚       â”œâ”€â”€ components/
+â”‚       â”‚   â”œâ”€â”€ auth/             # Rutas protegidas
+â”‚       â”‚   â”œâ”€â”€ chatbot/          # Widget del chatbot
+â”‚       â”‚   â”œâ”€â”€ layout/           # Navbar, Footer, Sidebar, AdminLayout
+â”‚       â”‚   â””â”€â”€ ui/               # Componentes reutilizables (Alertas, Tablas, Modales...)
+â”‚       â”œâ”€â”€ context/              # Contexto de autenticaciÃ³n
+â”‚       â”œâ”€â”€ pages/
+â”‚       â”‚   â”œâ”€â”€ admin/            # Dashboard, CRM, cursos, recursos, chat, contenido
+â”‚       â”‚   â”œâ”€â”€ auth/             # Login y registro
+â”‚       â”‚   â””â”€â”€ public/           # PÃ¡ginas del sitio pÃºblico
+â”‚       â”œâ”€â”€ App.jsx               # DefiniciÃ³n de rutas
+â”‚       â””â”€â”€ main.jsx              # Punto de entrada
+â”œâ”€â”€ levantar-sistema.cmd          # Arranque de un paso (Windows)
+â””â”€â”€ reconstruir-panel.cmd         # Recompila el frontend tras editar cÃ³digo
 ```
 
 ## Modelo de datos
 
 Base de datos relacional con las siguientes entidades:
 
-- **Roles** y **Usuarios** (autenticación y permisos)
+- **Roles** y **Usuarios** (autenticaciÃ³n y permisos)
 - **Clientes** (fichas del CRM con estados y responsable asignado)
 - **Interacciones** y **Seguimientos** (historial por cliente)
-- **Cursos** e **Inscripciones** (catálogo, estados y aula virtual con módulos, progreso y cuestionarios)
-- **Recursos** (materiales de cursos: documentos, presentaciones y enlaces, organizados por módulo)
-- **Módulos de curso** (exactamente 3 por curso), **Cuestionarios**, **Preguntas**, **Opciones** y **Intentos**
-- **Progreso de recursos** (finalización automática por usuario)
+- **Cursos** e **Inscripciones** (catÃ¡logo, estados y aula virtual con mÃ³dulos, progreso y cuestionarios)
+- **Recursos** (materiales de cursos: documentos, presentaciones y enlaces, organizados por mÃ³dulo)
+- **MÃ³dulos de curso** (exactamente 3 por curso), **Cuestionarios**, **Preguntas**, **Opciones** y **Intentos**
+- **Progreso de recursos** (finalizaciÃ³n automÃ¡tica por usuario)
 - **Conversaciones** y **Mensajes** (chatbot con escalamiento)
-- **Contenido de páginas** (CMS: textos, temas e actividades realizadas)
+- **Contenido de pÃ¡ginas** (CMS: textos, temas e actividades realizadas)
 - **Conocimiento del chatbot** (base administrable de preguntas/respuestas)
 - **Notificaciones** (asignaciones, seguimientos y escalamientos)
-- **Documentos corporativos** (información oficial de la fundación)
+- **Documentos corporativos** (informaciÃ³n oficial de la fundaciÃ³n)
 
 ## Copias de seguridad
 
 - **Base de datos SQLite:** copiar el archivo `backend/prisma/dev.db`.
 - **Archivos subidos:** copiar los archivos de `backend/src/uploads/`.
-- Las credenciales siempre van en `.env` (nunca en el código).
+- Las credenciales siempre van en `.env` (nunca en el cÃ³digo).
 
 ## Licencia
 
-Uso interno de la organización. Desarrollado con tecnologías de código abierto.
+Uso interno de la organizaciÃ³n. Desarrollado con tecnologÃ­as de cÃ³digo abierto.

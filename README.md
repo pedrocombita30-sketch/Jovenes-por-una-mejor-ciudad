@@ -1,4 +1,4 @@
-# Jóvenes por una Mejor Ciudad — Sistema de Gestión Integral
+﻿# Jóvenes por una Mejor Ciudad — Sistema de Gestión Integral
 
 Sistema web completo para la organización **"Jóvenes por una Mejor Ciudad"**. Integra una **página web pública**, un **CRM de clientes**, un **chatbot con inteligencia artificial**, un **módulo de cursos con inscripciones** y un **panel administrativo** con control de contenido.
 

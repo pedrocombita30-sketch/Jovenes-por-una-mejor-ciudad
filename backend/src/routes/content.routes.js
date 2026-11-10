@@ -1,11 +1,16 @@
 const router = require('express').Router();
 const multer = require('multer');
+const fs = require('fs');
 const path = require('path');
 const contentCtrl = require('../controllers/content.controller');
 const { protect, authorize } = require('../middleware/auth');
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, '../uploads/images')),
+  destination: (req, file, cb) => {
+    const dir = path.join(__dirname, '../uploads/images');
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
+  },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
     const unique = Date.now() + '-' + Math.round(Math.random() * 1e6);

@@ -71,7 +71,7 @@ function QuizRow({ module, onPresent }) {
 
           {quiz.passed ? (
             <p className="rounded-lg bg-green-50 p-3 font-medium text-green-800">
-              Cuestionario aprobado. {module.position < 3 ? `Se desbloqueó el Módulo ${module.position + 1}.` : '¡Último módulo completado!'}
+              Cuestionario aprobado. {!module.isLast ? `Se desbloqueó el Módulo ${module.number + 1}.` : '¡Último módulo completado!'}
             </p>
           ) : quiz.available ? (
             <button onClick={() => onPresent(module)} className="btn-primary text-sm">
@@ -108,12 +108,12 @@ function ModuleSection({ module, open, onToggle, onPresentQuiz, fetchBlob, onCom
             locked ? 'bg-gray-200 text-gray-500' : 'bg-primary-600 text-white'
           }`}
         >
-          {locked ? <Icon d={ICONS.LOCK} className="h-5 w-5" /> : module.position}
+          {locked ? <Icon d={ICONS.LOCK} className="h-5 w-5" /> : module.number}
         </span>
 
         <span className="min-w-0 flex-1">
           <span className="block text-xs font-semibold uppercase tracking-wider text-gray-500">
-            Módulo {module.position}
+            Módulo {module.number}
           </span>
           <span className={`block truncate text-base font-bold ${locked ? 'text-gray-500' : 'text-gray-800'}`}>
             {module.title}

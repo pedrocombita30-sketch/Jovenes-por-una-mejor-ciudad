@@ -106,7 +106,7 @@ export default function CourseStructure() {
         <section key={m.id} className="card overflow-hidden">
           <div className="flex flex-wrap items-start justify-between gap-3 border-b border-gray-100 bg-gray-50 px-5 py-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Módulo {m.position}</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Módulo {m.number}</p>
               <h2 className="text-lg font-bold text-gray-800">{m.title}</h2>
               {m.description && <p className="mt-1 text-sm text-gray-600">{m.description}</p>}
             </div>
@@ -240,7 +240,7 @@ export default function CourseStructure() {
       ))}
 
       {editingModule && (
-        <Modal isOpen onClose={() => setEditingModule(null)} title={`Editar Módulo ${editingModule.position}`} size="md">
+        <Modal isOpen onClose={() => setEditingModule(null)} title={`Editar Módulo ${editingModule.number}`} size="md">
           <ModuleForm
             module={editingModule}
             onSaved={() => { setEditingModule(null); flash('Módulo actualizado.'); load(); }}

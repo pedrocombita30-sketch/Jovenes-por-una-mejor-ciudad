@@ -151,7 +151,7 @@ export default function ResourceForm({
       {form.courseId && (
         <Select
           label="Módulo"
-          options={modules.map((m) => ({ value: String(m.id), label: `Módulo ${m.position}: ${m.title}` }))}
+          options={modules.map((m) => ({ value: String(m.id), label: `Módulo ${m.number}: ${m.title}` }))}
           value={form.moduleId}
           onChange={(e) => setForm({ ...form, moduleId: e.target.value })}
         />

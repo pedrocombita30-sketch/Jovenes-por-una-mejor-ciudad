@@ -42,7 +42,7 @@ const TEMAS = [
 ];
 
 const INTRO =
-  'En Jóvenes por una Mejor Ciudad creemos que el verdadero cambio nace de una juventud formada, consciente y comprometida con su entorno. Por eso, abordamos de manera integral seis temas fundamentales: liderazgo juvenil, educación, desarrollo social, deporte, medio ambiente y emprendimiento, que se conectan entre sí y fortalecen la transformación de nuestras comunidades.';
+  'En Fundación Jóvenes por una Mejor Ciudad creemos que el verdadero cambio nace de una juventud formada, consciente y comprometida con su entorno. Por eso, abordamos de manera integral seis temas fundamentales: liderazgo juvenil, educación, desarrollo social, deporte, medio ambiente y emprendimiento, que se conectan entre sí y fortalecen la transformación de nuestras comunidades.';
 
 export default function Temas() {
   const [images, setImages] = useState({});

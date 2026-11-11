@@ -17,6 +17,27 @@ async function main() {
       where: { courseId: course.id, position: 1 },
     });
 
+    // Numeración desde 0: los títulos por defecto "Módulo N" (y sus cuestionarios) pasan a "Módulo N-1".
+    // Solo se renombran los títulos que siguen siendo los genéricos; los personalizados no se tocan.
+    const modules = await prisma.courseModule.findMany({
+      where: { courseId: course.id },
+      include: { quiz: true },
+    });
+    for (const m of modules) {
+      if (m.title === `Módulo ${m.position}`) {
+        await prisma.courseModule.update({
+          where: { id: m.id },
+          data: { title: `Módulo ${m.position - 1}` },
+        });
+      }
+      if (m.quiz && m.quiz.title === `Cuestionario del Módulo ${m.position}`) {
+        await prisma.quiz.update({
+          where: { id: m.quiz.id },
+          data: { title: `Cuestionario del Módulo ${m.position - 1}` },
+        });
+      }
+    }
+
     const moved = await prisma.resource.updateMany({
       where: { courseId: course.id, moduleId: null },
       data: { moduleId: firstModule.id },

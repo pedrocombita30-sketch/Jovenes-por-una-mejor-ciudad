@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../../api/axios';
 import Spinner from '../../components/ui/Spinner';
 import Modal from '../../components/ui/Modal';
+import { ordenarActividades } from '../../utils/actividades';
 
 export default function Actividades() {
   const [page, setPage] = useState(null);
@@ -100,7 +101,7 @@ export default function Actividades() {
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {completed.map((act, i) => (
+            {ordenarActividades(completed).map((act, i) => (
               <button
                 key={act.id || `${act.title}-${i}`}
                 onClick={() => setSelected(act)}

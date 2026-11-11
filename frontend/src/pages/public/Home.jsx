@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
 import Modal from '../../components/ui/Modal';
+import { ordenarActividades } from '../../utils/actividades';
+
+// Número máximo de actividades realizadas que se muestran en el inicio.
+const MAX_INICIO = 9;
 
 export default function Home() {
   const [content, setContent] = useState(null);
@@ -26,7 +30,7 @@ export default function Home() {
       <section className="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-500 to-secondary-600 px-4 py-20 text-center text-white sm:px-6">
         <div className="relative z-10 mx-auto max-w-4xl">
           <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
-            Jóvenes por una<br />
+            Fundación Jóvenes por una<br />
             <span className="text-secondary-200">Mejor Ciudad</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-white/90">
@@ -58,7 +62,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {completed.map((act) => (
+            {ordenarActividades(completed).slice(0, MAX_INICIO).map((act) => (
               <button
                 key={act.id}
                 onClick={() => setSelectedAct(act)}
@@ -81,6 +85,13 @@ export default function Home() {
                 </div>
               </button>
             ))}
+          </div>
+        )}
+        {completed.length > MAX_INICIO && (
+          <div className="mt-10 text-center">
+            <Link to="/actividades" className="btn-secondary">
+              Ver todas las actividades
+            </Link>
           </div>
         )}
       </section>

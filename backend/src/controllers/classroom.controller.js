@@ -29,6 +29,7 @@ exports.getMyClassroom = asyncHandler(async (req, res) => {
       modules: progress.modules.map((m) => ({
         id: m.id,
         position: m.position,
+        number: m.number,
         title: m.title,
         status: m.status,
         percent: m.percent,

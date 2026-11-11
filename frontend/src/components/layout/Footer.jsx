@@ -11,11 +11,11 @@ export default function Footer() {
             <div className="flex items-center gap-2">
               <img src="/logo.png" alt="Logo" className="h-8 w-8 rounded-full object-cover" />
               <div className="text-sm font-bold text-white">
-                Jóvenes por una<br />Mejor Ciudad
+                Fundación Jóvenes por una<br />Mejor Ciudad
               </div>
             </div>
             <p className="mt-3 text-sm text-gray-400">
-              Organización juvenil dedicada a transformar nuestra ciudad a través de la participación y la educación.
+              Fundación JIMC
             </p>
           </div>
           <div>
@@ -46,7 +46,7 @@ export default function Footer() {
           <SocialLinks />
         </div>
         <div className="mt-8 text-center text-xs text-gray-500">
-          © {new Date().getFullYear()} Jóvenes por una Mejor Ciudad. Todos los derechos reservados.
+          © {new Date().getFullYear()} Fundación Jóvenes por una Mejor Ciudad. Todos los derechos reservados.
         </div>
       </div>
     </footer>

@@ -19,7 +19,7 @@ const RULES = [
   {
     keywords: ['hola', 'buenas', 'saludos', 'hey', 'buen dia', 'buenas tardes', 'buenas noches'],
     answer:
-      '¡Hola! Soy el asistente virtual de Jóvenes por una Mejor Ciudad. Estoy aquí para ayudarte con información sobre actividades, capacitaciones, recursos, voluntariado y más. ¿En qué puedo ayudarte?',
+      '¡Hola! Soy el asistente virtual de Fundación Jóvenes por una Mejor Ciudad. Estoy aquí para ayudarte con información sobre actividades, capacitaciones, recursos, voluntariado y más. ¿En qué puedo ayudarte?',
   },
   {
     keywords: ['gracias', 'muchas gracias', 'genial', 'excelente', 'perfecto'],
@@ -76,7 +76,7 @@ async function openAIResponse(messages, apiKey, model) {
   const systemMessage = {
     role: 'system',
     content:
-      'Eres el asistente virtual oficial de "Jóvenes por una Mejor Ciudad", una organización juvenil sin fines de lucro. Responde de forma breve, amable y en español. Si no conoces la respuesta, sugiere escalar la conversación a un colaborador humano.',
+      'Eres el asistente virtual oficial de "Fundación Jóvenes por una Mejor Ciudad", una organización juvenil sin fines de lucro. Responde de forma breve, amable y en español. Si no conoces la respuesta, sugiere escalar la conversación a un colaborador humano.',
   };
 
   const res = await fetch(endpoint, {

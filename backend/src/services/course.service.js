@@ -1,30 +1,94 @@
 const prisma = require('../config/database');
 const { AppError } = require('../utils/helpers');
 
-const MODULE_COUNT = 3;
+// Número de módulos que se crean por defecto en un curso nuevo. El administrador puede agregar más.
+const DEFAULT_MODULE_COUNT = 3;
 const DEFAULT_PASSING_SCORE = 70;
 const MAX_OPTIONS = 6;
 const MIN_OPTIONS = 2;
 
-// Garantiza que el curso tenga exactamente sus tres módulos y un cuestionario por módulo.
-// Es idempotente: puede ejecutarse varias veces sin duplicar registros.
-async function ensureCourseStructure(courseId) {
-  for (let position = 1; position <= MODULE_COUNT; position += 1) {
-    const mod = await prisma.courseModule.upsert({
-      where: { courseId_position: { courseId, position } },
-      update: {},
-      create: { courseId, position, title: `Módulo ${position}` },
-    });
+// La numeración visible empieza en 0: el módulo con position 1 es el "Módulo 0".
+const moduleNumber = (position) => position - 1;
+const defaultModuleTitle = (position) => `Módulo ${moduleNumber(position)}`;
 
-    await prisma.quiz.upsert({
-      where: { moduleId: mod.id },
-      update: {},
-      create: {
-        moduleId: mod.id,
-        title: `Cuestionario del Módulo ${position}`,
-        passingScore: DEFAULT_PASSING_SCORE,
-      },
-    });
+// Crea un módulo (y su cuestionario) en la posición indicada si todavía no existe.
+async function upsertModuleAt(courseId, position, title) {
+  const mod = await prisma.courseModule.upsert({
+    where: { courseId_position: { courseId, position } },
+    update: {},
+    create: { courseId, position, title: title || defaultModuleTitle(position) },
+  });
+
+  await prisma.quiz.upsert({
+    where: { moduleId: mod.id },
+    update: {},
+    create: {
+      moduleId: mod.id,
+      title: `Cuestionario del ${defaultModuleTitle(position)}`,
+      passingScore: DEFAULT_PASSING_SCORE,
+    },
+  });
+
+  return mod;
+}
+
+// Garantiza que el curso tenga al menos sus módulos por defecto y un cuestionario por módulo.
+// Es idempotente: no duplica ni elimina registros existentes.
+async function ensureCourseStructure(courseId) {
+  for (let position = 1; position <= DEFAULT_MODULE_COUNT; position += 1) {
+    await upsertModuleAt(courseId, position);
+  }
+}
+
+// Valida y normaliza la lista de módulos enviada desde el formulario.
+function normalizeModulesInput(modules) {
+  if (modules === undefined) return null;
+  if (!Array.isArray(modules)) throw new AppError('Formato de módulos inválido.', 400);
+
+  return modules.map((m) => {
+    const id = m?.id === undefined || m?.id === null || m?.id === '' ? null : Number(m.id);
+    if (id !== null && !Number.isInteger(id)) throw new AppError('Identificador de módulo inválido.', 400);
+    return {
+      id,
+      title: typeof m?.title === 'string' ? m.title.trim() : '',
+      description: typeof m?.description === 'string' ? m.description.trim() || null : null,
+    };
+  });
+}
+
+// Crea los módulos nuevos al final del curso y actualiza título/descripción de los existentes.
+// No elimina módulos: borrarlos rompería el progreso ya registrado de los alumnos.
+async function syncCourseModules(courseId, modulesInput) {
+  const items = normalizeModulesInput(modulesInput);
+  if (!items) return;
+
+  const existing = await prisma.courseModule.findMany({
+    where: { courseId },
+    orderBy: { position: 'asc' },
+  });
+  const existingIds = new Set(existing.map((m) => m.id));
+  let nextPosition = existing.reduce((max, m) => Math.max(max, m.position), 0) + 1;
+
+  for (const item of items) {
+    if (item.id !== null) {
+      if (!existingIds.has(item.id)) {
+        throw new AppError('Uno de los módulos no pertenece a este curso.', 400);
+      }
+      await prisma.courseModule.update({
+        where: { id: item.id },
+        data: {
+          ...(item.title ? { title: item.title } : {}),
+          description: item.description,
+        },
+      });
+    } else {
+      await upsertModuleAt(courseId, nextPosition, item.title);
+      await prisma.courseModule.update({
+        where: { courseId_position: { courseId, position: nextPosition } },
+        data: { description: item.description },
+      });
+      nextPosition += 1;
+    }
   }
 }
 
@@ -114,7 +178,7 @@ async function buildCourseProgress(userId, courseId) {
 
     let quizBlockedReason = null;
     if (!unlocked) {
-      quizBlockedReason = `Aprueba el cuestionario del Módulo ${m.position - 1} para desbloquear este módulo.`;
+      quizBlockedReason = `Aprueba el cuestionario del Módulo ${moduleNumber(m.position - 1)} para desbloquear este módulo.`;
     } else if (passed) {
       quizBlockedReason = 'Ya aprobaste este cuestionario.';
     } else if (total === 0) {
@@ -130,6 +194,8 @@ async function buildCourseProgress(userId, courseId) {
     result.push({
       id: m.id,
       position: m.position,
+      number: moduleNumber(m.position),
+      isLast: m.position === modules[modules.length - 1].position,
       title: m.title,
       description: m.description,
       status,
@@ -169,7 +235,7 @@ async function buildCourseProgress(userId, courseId) {
   }
   const overallPercent = totalItems ? Math.round((doneItems / totalItems) * 100) : 0;
   const last = result[result.length - 1];
-  const finished = result.length === MODULE_COUNT && Boolean(last?.quiz?.passed);
+  const finished = Boolean(last) && Boolean(last.quiz?.passed);
 
   return {
     course,
@@ -305,7 +371,12 @@ async function submitQuizAttempt(userId, courseId, moduleId, answers) {
   });
 
   // Aprobar el cuestionario del Módulo 3 finaliza el curso.
-  if (passed && mod.position === MODULE_COUNT) {
+  // Aprobar el cuestionario del último módulo del curso lo finaliza.
+  const lastModule = await prisma.courseModule.findFirst({
+    where: { courseId },
+    orderBy: { position: 'desc' },
+  });
+  if (passed && lastModule && mod.id === lastModule.id) {
     await prisma.enrollment.updateMany({
       where: { courseId, userId, completedAt: null },
       data: { completedAt: new Date() },
@@ -348,9 +419,11 @@ function validateQuestionPayload(body) {
 }
 
 module.exports = {
-  MODULE_COUNT,
+  DEFAULT_MODULE_COUNT,
   DEFAULT_PASSING_SCORE,
+  moduleNumber,
   ensureCourseStructure,
+  syncCourseModules,
   requireAcceptedEnrollment,
   buildCourseProgress,
   assertModuleAccessible,

@@ -72,8 +72,8 @@ export default function ChatWidget() {
   };
 
   const welcome = user
-    ? `Hola ${user.firstName}! Soy el asistente de Jóvenes por una Mejor Ciudad. ¿En qué puedo ayudarte hoy?`
-    : '¡Hola! Soy el asistente virtual de Jóvenes por una Mejor Ciudad. ¿En qué puedo ayudarte?';
+    ? `Hola ${user.firstName}! Soy el asistente de Fundación Jóvenes por una Mejor Ciudad. ¿En qué puedo ayudarte hoy?`
+    : '¡Hola! Soy el asistente virtual de Fundación Jóvenes por una Mejor Ciudad. ¿En qué puedo ayudarte?';
 
   return (
     <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end">
@@ -89,7 +89,7 @@ export default function ChatWidget() {
               </div>
               <div>
                 <p className="text-sm font-bold">Asistente virtual</p>
-                <p className="text-[10px] text-white/80">En línea · Jóvenes por una Mejor Ciudad</p>
+                <p className="text-[10px] text-white/80">En línea · Fundación Jóvenes por una Mejor Ciudad</p>
               </div>
             </div>
             <button onClick={() => setOpen(false)} className="rounded-lg p-1 hover:bg-white/20">

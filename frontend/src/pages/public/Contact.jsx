@@ -30,7 +30,7 @@ export default function Contact() {
             </svg>
           </div>
           <h3 className="font-semibold text-gray-800">Teléfono</h3>
-          <p className="mt-1 text-sm text-gray-500">+57 318 3704018</p>
+          <p className="mt-1 text-sm text-gray-500">+57-351-555-0221</p>
         </div>
         <div className="card p-6 text-center">
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary-100 text-primary-600">

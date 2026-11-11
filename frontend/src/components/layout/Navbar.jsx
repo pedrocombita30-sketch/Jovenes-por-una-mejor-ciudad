@@ -30,7 +30,7 @@ export default function Navbar() {
           <img src="/logo.png" alt="Logo" className="h-9 w-9 rounded-full object-cover" />
           <div className="leading-tight">
             <span className="block text-sm font-extrabold text-primary-600">
-              Jóvenes por una
+              Fundación Jóvenes por una
             </span>
             <span className="block text-sm font-extrabold text-secondary-700">
               Mejor Ciudad

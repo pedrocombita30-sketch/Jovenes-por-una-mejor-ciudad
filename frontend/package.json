@@ -1,7 +1,7 @@
 {
   "name": "jovenes-ciudad-frontend",
   "version": "1.0.0",
-  "description": "Frontend del sistema de gestión para Jóvenes por una Mejor Ciudad",
+  "description": "Frontend del sistema de gestión para Fundación Jóvenes por una Mejor Ciudad",
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -1,4 +1,4 @@
-// Prisma schema para Jóvenes por una Mejor Ciudad
+// Prisma schema para Fundación Jóvenes por una Mejor Ciudad
 // SQLite para desarrollo. Cambiar provider a "postgresql" para producción.
 
 generator client {
@@ -172,8 +172,8 @@ model Course {
   @@index([active])
 }
 
-// Cada curso tiene exactamente tres módulos (position 1, 2 y 3).
-// No existen endpoints para crear ni eliminar módulos.
+// Cada curso tiene uno o más módulos (position 1, 2, 3...). La numeración visible empieza en 0.
+// Los módulos se pueden agregar desde el panel; no se eliminan para conservar el progreso.
 model CourseModule {
   id          Int      @id @default(autoincrement())
   courseId    Int

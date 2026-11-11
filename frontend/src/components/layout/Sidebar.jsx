@@ -43,7 +43,7 @@ export default function Sidebar({ open, onClose }) {
         <div className="flex items-center gap-2 border-b border-gray-800 bg-gradient-to-r from-primary-600 via-primary-500 to-secondary-600 px-5 py-4">
           <img src="/logo.png" alt="Logo" className="h-8 w-8 rounded-full object-cover" />
           <div className="text-sm font-bold text-white drop-shadow-sm">
-            Jóvenes por una<br />Mejor Ciudad
+            Fundación Jóvenes por una<br />Mejor Ciudad
           </div>
         </div>
 

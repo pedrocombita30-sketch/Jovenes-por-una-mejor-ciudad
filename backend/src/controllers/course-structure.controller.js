@@ -40,7 +40,13 @@ exports.getStructure = asyncHandler(async (req, res) => {
     },
   });
 
-  res.json({ success: true, data: { course, modules } });
+  res.json({
+    success: true,
+    data: {
+      course,
+      modules: modules.map((m) => ({ ...m, number: service.moduleNumber(m.position) })),
+    },
+  });
 });
 
 exports.updateModule = asyncHandler(async (req, res) => {

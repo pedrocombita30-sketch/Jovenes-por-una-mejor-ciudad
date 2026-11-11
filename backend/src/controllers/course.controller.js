@@ -1,11 +1,15 @@
 const prisma = require('../config/database');
 const { AppError, asyncHandler } = require('../utils/helpers');
 const { ENROLLMENT_STATUSES } = require('../utils/constants');
-const { ensureCourseStructure } = require('../services/course.service');
+const { ensureCourseStructure, syncCourseModules } = require('../services/course.service');
 
 const courseInclude = {
   creator: { select: { id: true, firstName: true, lastName: true } },
   _count: { select: { resources: true, enrollments: true } },
+  modules: {
+    orderBy: { position: 'asc' },
+    select: { id: true, position: true, title: true, description: true },
+  },
 };
 
 // ========== CURSOS ==========
@@ -98,9 +102,15 @@ exports.createCourse = asyncHandler(async (req, res, next) => {
     include: courseInclude,
   });
 
-  await ensureCourseStructure(course.id);
+  // Un curso nuevo parte con 3 módulos por defecto; el formulario puede enviar los suyos.
+  if (Array.isArray(req.body.modules) && req.body.modules.length > 0) {
+    await syncCourseModules(course.id, req.body.modules);
+  } else {
+    await ensureCourseStructure(course.id);
+  }
 
-  res.status(201).json({ success: true, data: course });
+  const full = await prisma.course.findUnique({ where: { id: course.id }, include: courseInclude });
+  res.status(201).json({ success: true, data: full });
 });
 
 exports.updateCourse = asyncHandler(async (req, res, next) => {
@@ -120,6 +130,9 @@ exports.updateCourse = asyncHandler(async (req, res, next) => {
   if (modality !== undefined) data.modality = modality;
   if (imageUrl !== undefined) data.imageUrl = imageUrl.trim() || null;
   if (active !== undefined) data.active = Boolean(active);
+
+  await ensureCourseStructure(id);
+  await syncCourseModules(id, req.body.modules);
 
   const course = await prisma.course.update({ where: { id }, data, include: courseInclude });
   res.json({ success: true, data: course });

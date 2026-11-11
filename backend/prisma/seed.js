@@ -73,7 +73,7 @@ async function main() {
   const defaultPages = [
     {
       slug: 'inicio',
-      title: 'Jóvenes por una Mejor Ciudad',
+      title: 'Fundación Jóvenes por una Mejor Ciudad',
       content:
         'Somos una organización juvenil dedicada a transformar nuestra ciudad a través de la participación ciudadana, la educación y el voluntariado social. Trabajamos junto a jóvenes, comunidades y aliados para construir una ciudad más justa, inclusiva y sostenible.',
       imageUrl: null,

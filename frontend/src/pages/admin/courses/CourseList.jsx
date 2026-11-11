@@ -13,8 +13,13 @@ const modalityLabels = {
   HIBRIDA: 'Híbrida',
 };
 
+// Módulos por defecto de un curso nuevo. La numeración visible empieza en 0.
+const blankModules = (count) =>
+  Array.from({ length: count }, () => ({ id: null, number: null, title: '', description: '' }));
+
 export default function CourseList() {
   const [courses, setCourses] = useState([]);
+  const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -41,6 +46,7 @@ export default function CourseList() {
 
   const openCreate = () => {
     setForm(EMPTY);
+    setModules(blankModules(3));
     setEditingId(null);
     setError('');
     setSuccess('');
@@ -55,11 +61,37 @@ export default function CourseList() {
       modality: course.modality || 'PRESENCIAL',
       active: course.active !== false,
     });
+    setModules(
+      (course.modules || []).map((m) => ({
+        id: m.id,
+        number: m.position - 1,
+        title: m.title || '',
+        description: m.description || '',
+      }))
+    );
     setEditingId(course.id);
     setError('');
     setSuccess('');
     setShowForm(true);
   };
+
+  const updateModule = (index, field, value) =>
+    setModules((prev) => prev.map((m, i) => (i === index ? { ...m, [field]: value } : m)));
+
+  const addModule = () => setModules((prev) => [...prev, { id: null, number: null, title: '', description: '' }]);
+
+  const removeModule = (index) => setModules((prev) => prev.filter((_, i) => i !== index));
+
+  // Los módulos existentes conservan su número; los nuevos continúan la secuencia.
+  const lastExistingNumber = modules.reduce((max, m) => (m.id ? Math.max(max, m.number) : max), -1);
+  const numberedModules = (() => {
+    let next = lastExistingNumber;
+    return modules.map((m) => {
+      if (m.id) return { ...m, shownNumber: m.number };
+      next += 1;
+      return { ...m, shownNumber: next };
+    });
+  })();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -70,12 +102,17 @@ export default function CourseList() {
 
     setSaving(true);
     setError('');
+    const payload = {
+      ...form,
+      modules: modules.map((m) => ({ id: m.id, title: m.title, description: m.description })),
+    };
+
     try {
       if (editingId) {
-        await api.put(`/courses/${editingId}`, form);
+        await api.put(`/courses/${editingId}`, payload);
         setSuccess('Curso actualizado.');
       } else {
-        await api.post('/courses', form);
+        await api.post('/courses', payload);
         setSuccess('Curso creado.');
       }
       setShowForm(false);
@@ -235,6 +272,53 @@ export default function CourseList() {
                 <option value="HIBRIDA">Hibrida</option>
               </select>
             </div>
+          </div>
+
+          <div>
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <span className="text-sm font-semibold text-gray-700">Módulos del curso</span>
+              <span className="text-xs text-gray-500">
+                Los módulos existentes no se eliminan para conservar el progreso de los alumnos.
+              </span>
+            </div>
+            <div className="space-y-3">
+              {numberedModules.map((m, index) => (
+                <div key={m.id ?? `nuevo-${index}`} className="rounded-lg border border-gray-200 p-3">
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                      Módulo {m.shownNumber}
+                      {m.id ? '' : ' (nuevo)'}
+                    </span>
+                    {!m.id && (
+                      <button
+                        type="button"
+                        onClick={() => removeModule(index)}
+                        className="text-xs font-semibold text-red-600"
+                      >
+                        Quitar
+                      </button>
+                    )}
+                  </div>
+                  <input
+                    type="text"
+                    value={m.title}
+                    onChange={(e) => updateModule(index, 'title', e.target.value)}
+                    placeholder={`Título del Módulo ${m.shownNumber}`}
+                    className="input-field mb-2"
+                  />
+                  <textarea
+                    rows={2}
+                    value={m.description}
+                    onChange={(e) => updateModule(index, 'description', e.target.value)}
+                    placeholder="Descripción del módulo (opcional)"
+                    className="input-field"
+                  />
+                </div>
+              ))}
+            </div>
+            <button type="button" onClick={addModule} className="mt-3 text-xs font-semibold text-primary-600 hover:text-primary-700">
+              + Agregar módulo
+            </button>
           </div>
 
           <label className="flex items-center gap-2 text-sm text-gray-700">

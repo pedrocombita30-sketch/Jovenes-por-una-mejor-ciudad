@@ -1,6 +1,6 @@
-﻿# Jóvenes por una Mejor Ciudad — Sistema de Gestión Integral
+﻿# Fundación Jóvenes por una Mejor Ciudad — Sistema de Gestión Integral
 
-Sistema web completo para la organización **"Jóvenes por una Mejor Ciudad"**. Integra una **página web pública**, un **CRM de clientes**, un **chatbot con inteligencia artificial**, un **módulo de cursos con inscripciones** y un **panel administrativo** con control de contenido.
+Sistema web completo para la organización **"Fundación Jóvenes por una Mejor Ciudad"**. Integra una **página web pública**, un **CRM de clientes**, un **chatbot con inteligencia artificial**, un **módulo de cursos con inscripciones** y un **panel administrativo** con control de contenido.
 
 ## Descripción del proyecto
 
@@ -208,7 +208,7 @@ Base de datos relacional con las siguientes entidades:
 - **Interacciones** y **Seguimientos** (historial por cliente)
 - **Cursos** e **Inscripciones** (catálogo, estados y aula virtual con módulos, progreso y cuestionarios)
 - **Recursos** (materiales de cursos: documentos, presentaciones y enlaces, organizados por módulo)
-- **Módulos de curso** (exactamente 3 por curso), **Cuestionarios**, **Preguntas**, **Opciones** y **Intentos**
+- **Módulos de curso** (3 por defecto; el administrador puede agregar más, numerados desde 0), **Cuestionarios**, **Preguntas**, **Opciones** y **Intentos**
 - **Progreso de recursos** (finalización automática por usuario)
 - **Conversaciones** y **Mensajes** (chatbot con escalamiento)
 - **Contenido de páginas** (CMS: textos, temas e actividades realizadas)

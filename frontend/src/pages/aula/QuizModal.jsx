@@ -179,9 +179,9 @@ export default function QuizModal({ courseId, module, onClose, onChanged }) {
             </p>
             <p className="mt-3 text-sm text-gray-600">
               {result.passed
-                ? module.position === 3
+                ? module.isLast
                   ? 'Completaste el último módulo y el curso queda finalizado.'
-                  : `Se desbloqueó el Módulo ${module.position + 1}.`
+                  : `Se desbloqueó el Módulo ${module.number + 1}.`
                 : 'Puedes volver a presentar el cuestionario cuando quieras.'}
             </p>
           </div>

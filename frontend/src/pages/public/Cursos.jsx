@@ -80,7 +80,7 @@ function AulaExtendida({ courses }) {
             {course.modules.map((m) => (
               <li key={m.id} className="flex items-center justify-between gap-2 text-xs">
                 <span className="truncate text-gray-700">
-                  {m.position}. {m.title}
+                  {m.number}. {m.title}
                 </span>
                 <span
                   className={`shrink-0 rounded-full px-2 py-0.5 font-semibold ${moduleStatusStyles[m.status]}`}

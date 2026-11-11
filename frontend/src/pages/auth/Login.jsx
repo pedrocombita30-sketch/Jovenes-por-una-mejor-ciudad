@@ -33,7 +33,7 @@ export default function Login() {
       <div className="w-full max-w-md">
         <div className="mb-6 text-center">
           <img src="/logo.png" alt="Logo" className="mx-auto mb-3 h-14 w-14 rounded-full object-cover" />
-          <h1 className="text-2xl font-bold text-white">Jóvenes por una Mejor Ciudad</h1>
+          <h1 className="text-2xl font-bold text-white">Fundación Jóvenes por una Mejor Ciudad</h1>
           <p className="text-white/80">Inicia sesión en tu cuenta</p>
         </div>
 

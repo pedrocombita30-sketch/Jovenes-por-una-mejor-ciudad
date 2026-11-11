@@ -91,7 +91,7 @@ export default function Register() {
             <Input
               label="Teléfono"
               id="phone"
-              placeholder="+57 318 3704018"
+              placeholder="+57-351-555-0221"
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
             />

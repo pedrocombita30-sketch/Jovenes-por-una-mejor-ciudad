@@ -1,7 +1,7 @@
 {
   "name": "jovenes-ciudad-backend",
   "version": "1.0.0",
-  "description": "API REST del sistema de gestión para Jóvenes por una Mejor Ciudad",
+  "description": "API REST del sistema de gestión para Fundación Jóvenes por una Mejor Ciudad",
   "main": "src/app.js",
   "scripts": {
     "dev": "node --watch src/server.js",

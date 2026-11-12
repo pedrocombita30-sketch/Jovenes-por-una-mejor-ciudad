@@ -18,6 +18,15 @@ export default function ChatWidget() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, typing, open]);
 
+  // Al cerrar sesión o entrar con otra cuenta, la conversación anterior deja de mostrarse.
+  useEffect(() => {
+    setMessages([]);
+    setConversationId(null);
+    setAccessToken(null);
+    setInput('');
+    setError('');
+  }, [user?.id]);
+
   useEffect(() => {
     if (!open || !conversationId) return;
     let lastId = 0;
@@ -63,14 +72,9 @@ export default function ChatWidget() {
       );
       setConversationId(data.data.conversationId);
       if (data.data.accessToken) setAccessToken(data.data.accessToken);
-      setMessages((prev) => [...prev, { id: Date.now() + 1, sender: 'BOT', content: data.data.botMessage.content }]);
-      if (data.data.escalated) {
-        setMessages((prev) => [...prev, {
-          id: Date.now() + 2,
-          sender: 'BOT',
-          content: 'Un colaborador humano se hará cargo de tu conversación por este canal. Puedes responder aquí y te atenderá nuestro equipo.',
-        }]);
-      }
+      // Se usa el mensaje tal como lo guardó el servidor (con su id) para que el sondeo no lo repita.
+      // Si la conversación fue escalada, el servidor ya guarda su propio aviso y llega por el sondeo.
+      setMessages((prev) => [...prev, data.data.botMessage]);
     } catch (err) {
       setError(err.response?.data?.message || 'No se pudo enviar el mensaje.');
       setMessages((prev) => prev.slice(0, -1));

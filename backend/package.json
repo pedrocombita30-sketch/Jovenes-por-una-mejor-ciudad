@@ -11,7 +11,8 @@
     "prisma:studio": "prisma studio",
     "db:seed": "node prisma/seed.js",
     "db:setup": "prisma db push && node prisma/seed.js",
-    "db:migrate:courses": "node prisma/migrate-course-modules.js"
+    "db:migrate:courses": "node prisma/migrate-course-modules.js",
+    "db:migrate:private-files": "node prisma/migrate-private-files.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

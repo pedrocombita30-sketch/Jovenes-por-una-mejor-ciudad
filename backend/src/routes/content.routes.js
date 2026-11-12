@@ -2,6 +2,7 @@ const router = require('express').Router();
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
+const { isSafeUpload } = require('../utils/uploads');
 const contentCtrl = require('../controllers/content.controller');
 const { protect, authorize } = require('../middleware/auth');
 
@@ -24,7 +25,7 @@ const upload = multer({
     const allowed = /png|jpg|jpeg|webp|gif|svg/;
     const ext = allowed.test(path.extname(file.originalname).toLowerCase());
     const mime = file.mimetype.startsWith('image/');
-    cb(null, ext || mime);
+    cb(null, (ext || mime) && isSafeUpload(file));
   },
 });
 

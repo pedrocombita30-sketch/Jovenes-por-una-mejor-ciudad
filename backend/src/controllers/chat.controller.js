@@ -1,4 +1,24 @@
+const crypto = require('crypto');
 const prisma = require('../config/database');
+
+// Personal autorizado (ADMIN o COLABORADOR) puede consultar cualquier conversación.
+const esPersonal = (req) => ['ADMIN', 'COLABORADOR'].includes(req.user?.role?.name);
+
+const tokenValido = (esperado, recibido) => {
+  if (!esperado || !recibido) return false;
+  const a = Buffer.from(String(esperado));
+  const b = Buffer.from(String(recibido));
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+};
+
+// Conversaciones de visitantes (sin cuenta): solo quien tiene su token puede leerlas o escribir.
+// Conversaciones de usuarios registrados: solo su dueño.
+function comprobarAcceso(conversation, req) {
+  if (esPersonal(req)) return;
+  if (!conversation.userId && tokenValido(conversation.accessToken, req.get('x-conversation-token'))) return;
+  if (conversation.userId && req.user && req.user.id === conversation.userId) return;
+  throw new AppError('No tienes acceso a esta conversación.', 403);
+}
 const { AppError, asyncHandler } = require('../utils/helpers');
 const { generateResponse } = require('../services/ai.service');
 const { ROLES, NOTIFICATION_TYPES } = require('../utils/constants');
@@ -17,6 +37,7 @@ exports.sendMessage = asyncHandler(async (req, res, next) => {
       where: { id: Number(conversationId) },
     });
     if (!conversation) throw new AppError('Conversación no encontrada.', 404);
+    comprobarAcceso(conversation, req);
     if (conversation.status === 'CERRADA') {
       throw new AppError('Esta conversación está cerrada. Inicia una nueva.', 400);
     }
@@ -32,7 +53,7 @@ exports.sendMessage = asyncHandler(async (req, res, next) => {
       }
     } else {
       conversation = await prisma.conversation.create({
-        data: { userId: null, status: 'ACTIVA' },
+        data: { userId: null, status: 'ACTIVA', accessToken: crypto.randomBytes(32).toString('hex') },
       });
     }
   }
@@ -83,6 +104,7 @@ exports.sendMessage = asyncHandler(async (req, res, next) => {
       botMessage,
       usedMock,
       escalated: escalate,
+      accessToken: conversation.userId ? undefined : conversation.accessToken,
     },
   });
 });
@@ -170,6 +192,8 @@ exports.pollConversation = asyncHandler(async (req, res, next) => {
 
   const conversation = await prisma.conversation.findUnique({ where: { id } });
   if (!conversation) throw new AppError('Conversación no encontrada.', 404);
+
+  comprobarAcceso(conversation, req);
 
   const messages = await prisma.message.findMany({
     where: { conversationId: id, id: { gt: after } },

@@ -26,7 +26,9 @@ async function main() {
   console.log('Roles listos.');
 
   // Usuarios de prueba
-  const password = await bcrypt.hash('Admin123!', 10);
+  // Contraseña de las cuentas de prueba. Configurable con SEED_PASSWORD (recomendado fuera de desarrollo).
+  const seedPassword = process.env.SEED_PASSWORD || 'Admin123!';
+  const password = await bcrypt.hash(seedPassword, 10);
 
   const admin = await prisma.user.upsert({
     where: { email: 'admin@jovenes-ciudad.org' },
@@ -323,9 +325,10 @@ async function main() {
 
   console.log('\nSeed completado exitosamente.');
   console.log('Usuarios de prueba:');
-  console.log('  admin@jovenes-ciudad.org / Admin123! (Administrador)');
-  console.log('  colaborador@jovenes-ciudad.org / Admin123! (Colaborador)');
-  console.log('  usuario@example.com / Admin123! (Cliente)');
+  console.log('  admin@jovenes-ciudad.org (Administrador)');
+  console.log('  colaborador@jovenes-ciudad.org (Colaborador)');
+  console.log('  usuario@example.com (Cliente)');
+  console.log(`  Contraseña: la definida en SEED_PASSWORD${process.env.SEED_PASSWORD ? '' : ' (no definida: se usa la de desarrollo)'}.`);
 }
 
 main()

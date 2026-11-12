@@ -87,10 +87,19 @@ exports.me = asyncHandler(async (req, res, next) => {
 });
 
 exports.updateProfile = asyncHandler(async (req, res, next) => {
-  const { firstName, lastName, phone, password: newPassword } = req.body;
+  const { firstName, lastName, phone, password: newPassword, currentPassword } = req.body;
 
   const data = { firstName, lastName, phone };
   if (newPassword) {
+    if (String(newPassword).length < 8) {
+      throw new AppError('La nueva contraseña debe tener al menos 8 caracteres.', 400);
+    }
+    // Para cambiar la contraseña hay que confirmar la actual. Se responde 400 (no 401) para que el
+    // frontend no cierre la sesión por un error de confirmación.
+    const actualOk = Boolean(currentPassword) && (await bcrypt.compare(String(currentPassword), req.user.password));
+    if (!actualOk) {
+      throw new AppError('Debes escribir tu contraseña actual correctamente para cambiarla.', 400);
+    }
     data.password = await bcrypt.hash(newPassword, 10);
   }
 

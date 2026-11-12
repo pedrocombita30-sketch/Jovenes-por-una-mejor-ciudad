@@ -280,6 +280,7 @@ model Conversation {
   userId     Int?
   user       User?    @relation("UserConversations", fields: [userId], references: [id], onDelete: SetNull)
   status     String   @default("ACTIVA")
+  accessToken String?
   assignedTo Int?
   assignedCollaborator User? @relation("EscalatedConversations", fields: [assignedTo], references: [id])
   createdAt  DateTime @default(now())

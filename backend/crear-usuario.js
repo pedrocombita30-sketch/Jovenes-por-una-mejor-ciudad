@@ -1,21 +1,29 @@
 /**
- * Crea una cuenta de ADMINISTRADOR.
+ * Crea (o actualiza la contraseña de) una cuenta de ADMINISTRADOR.
  * Uso: node crear-usuario.js <correo> <nombre> <apellido> [contraseña]
- * Ejemplo: node crear-usuario.js admin2@jovenes-ciudad.org Ana Torres Admin123!
  *
- * Si no se pasa contraseña, usa "Admin123!" por defecto.
+ * Si no se pasa contraseña, se genera una aleatoria y se muestra una sola vez.
  * Desde el panel administrativo NO se pueden crear administradores.
  */
+const crypto = require('crypto');
 const prisma = require('./src/config/database');
 const bcrypt = require('bcryptjs');
 
-const [email, firstName, lastName, password = 'Admin123!'] = process.argv.slice(2);
+const [email, firstName, lastName, suppliedPassword] = process.argv.slice(2);
 
 if (!email || !firstName || !lastName) {
   console.log('Uso: node crear-usuario.js <correo> <nombre> <apellido> [contraseña]');
-  console.log('Ejemplo: node crear-usuario.js admin2@jovenes-ciudad.org Ana Torres Admin123!');
+  console.log('Ejemplo: node crear-usuario.js admin2@jovenes-ciudad.org Ana Torres');
   process.exit(1);
 }
+
+if (suppliedPassword !== undefined && suppliedPassword.length < 8) {
+  console.error('Error: la contraseña debe tener al menos 8 caracteres.');
+  process.exit(1);
+}
+
+const generated = suppliedPassword === undefined;
+const password = generated ? crypto.randomBytes(9).toString('base64url') : suppliedPassword;
 
 prisma.role
   .findUnique({ where: { name: 'ADMIN' } })
@@ -39,7 +47,9 @@ prisma.role
   })
   .then((user) => {
     console.log(`Administrador listo: ${user.email} (${user.firstName} ${user.lastName})`);
-    console.log(`Contraseña: ${password}`);
+    if (generated) {
+      console.log(`Contraseña generada (guárdala ahora, no se volverá a mostrar): ${password}`);
+    }
     process.exit(0);
   })
   .catch((e) => {

@@ -20,6 +20,10 @@ backend/src/uploads/images/*
 !backend/src/uploads/documents/.gitkeep
 !backend/src/uploads/images/.gitkeep
 
+# Materiales privados de cursos (no se sirven públicamente)
+backend/src/private-uploads/*
+!backend/src/private-uploads/.gitkeep
+
 # Logs
 *.log
 npm-debug.log*

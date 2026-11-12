@@ -50,7 +50,7 @@ if exist "%~dp0backend\.env" (
 ) else (
   echo        [AVISO] No existe backend\.env - se crea con valores por defecto...
   pushd "%~dp0backend"
-  copy /y ".env.example" ".env" >nul
+  node scripts\crear-env.js
   popd
   start "JMC Servidor - 3001" /D "%~dp0backend" cmd /k "npm start"
 )
@@ -76,7 +76,7 @@ if defined LANIP (
 )
 echo.
 echo   Panel admin: http://localhost:3001/login
-echo       admin@jovenes-ciudad.org / Admin123!
+echo       (usa tu cuenta de administrador; si no tienes una, crea una con backend\crear-usuario.js)
 echo.
 echo   NO cierres la ventana del servidor.
 echo   Este aviso se cierra solo en 20 segundos.

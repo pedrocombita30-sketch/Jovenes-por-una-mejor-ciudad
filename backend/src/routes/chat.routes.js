@@ -1,9 +1,17 @@
 const router = require('express').Router();
 const chatCtrl = require('../controllers/chat.controller');
 const { protect, authorize } = require('../middleware/auth');
+const { rateLimit } = require('../middleware/rateLimit');
+
+// Mensajes del chat: 30 por IP por minuto.
+const messageLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  message: 'Estás enviando mensajes muy rápido. Espera un momento.',
+});
 
 // Public: send message (anonymous or authenticated)
-router.post('/', chatCtrl.sendMessage);
+router.post('/', messageLimiter, chatCtrl.sendMessage);
 router.get('/conversations/:id/poll', chatCtrl.pollConversation);
 
 // Protected

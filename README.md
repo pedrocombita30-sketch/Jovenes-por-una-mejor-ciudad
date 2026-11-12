@@ -115,6 +115,24 @@ npm run db:migrate:courses
 
 Es idempotente: puede ejecutarse varias veces sin duplicar registros.
 
+Los materiales de cursos se guardan en una carpeta privada (`backend/src/private-uploads`) que no es
+pública. Los archivos anteriores se mueven con:
+
+```bash
+cd backend
+npm run db:migrate:private-files
+```
+
+### Seguridad: variables de entorno
+
+- `JWT_SECRET`: al crear `backend/.env`, `levantar-sistema.cmd` genera un secreto aleatorio. Si lo editas
+  a mano, usa un valor largo y aleatorio. El servidor avisa si el secreto es débil.
+- `TRUST_PROXY=1`: obligatorio si el servidor está detrás de un proxy (Render, etc.). Sin esto, el límite de
+  intentos de inicio de sesión cuenta a todos los usuarios como una sola IP.
+- `SEED_PASSWORD`: contraseña de las cuentas de prueba del seed. Si no se define, se usa una de desarrollo.
+  No ejecutes el seed en producción con la contraseña por defecto.
+- Las cuentas que ya existen con la contraseña de desarrollo deben cambiarse manualmente en producción.
+
 Para producción con **PostgreSQL**, cambiar en `backend/prisma/schema.prisma`:
 
 ```prisma

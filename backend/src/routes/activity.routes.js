@@ -1,8 +1,9 @@
 const router = require('express').Router();
 const multer = require('multer');
 const path = require('path');
+const { isSafeUpload } = require('../utils/uploads');
 const activityCtrl = require('../controllers/activity.controller');
-const { protect, authorize } = require('../middleware/auth');
+const { protect, authorize, optionalAuth } = require('../middleware/auth');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -22,13 +23,13 @@ const upload = multer({
     const allowed = /png|jpg|jpeg|webp|gif|svg/;
     const ext = allowed.test(path.extname(file.originalname).toLowerCase());
     const mime = file.mimetype.startsWith('image/');
-    cb(null, ext || mime);
+    cb(null, (ext || mime) && isSafeUpload(file));
   },
 });
 
 // Public read
-router.get('/', activityCtrl.getActivities);
-router.get('/:id', activityCtrl.getActivity);
+router.get('/', optionalAuth, activityCtrl.getActivities);
+router.get('/:id', optionalAuth, activityCtrl.getActivity);
 
 router.use(protect);
 

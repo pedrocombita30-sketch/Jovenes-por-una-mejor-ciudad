@@ -7,6 +7,8 @@ export default function ChatWidget() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [conversationId, setConversationId] = useState(null);
+  // Token que el servidor entrega a los visitantes sin cuenta; sin él no se puede leer la conversación.
+  const [accessToken, setAccessToken] = useState(null);
   const [typing, setTyping] = useState(false);
   const [error, setError] = useState('');
   const bottomRef = useRef(null);
@@ -21,7 +23,9 @@ export default function ChatWidget() {
     let lastId = 0;
     const timer = setInterval(async () => {
       try {
-        const { data } = await api.get(`/chat/conversations/${conversationId}/poll?after=${lastId}`);
+        const { data } = await api.get(`/chat/conversations/${conversationId}/poll?after=${lastId}`, {
+          headers: accessToken ? { 'X-Conversation-Token': accessToken } : {},
+        });
         const incoming = (data.data?.messages || []).filter((m) => m.sender !== 'USUARIO');
         if (incoming.length) {
           setMessages((prev) => {
@@ -36,7 +40,7 @@ export default function ChatWidget() {
       }
     }, 4000);
     return () => clearInterval(timer);
-  }, [open, conversationId]);
+  }, [open, conversationId, accessToken]);
 
   const sendMessage = async (e) => {
     e?.preventDefault();
@@ -49,11 +53,16 @@ export default function ChatWidget() {
     setError('');
 
     try {
-      const { data } = await api.post('/chat', {
-        message: text,
-        conversationId: conversationId || undefined,
-      });
+      const { data } = await api.post(
+        '/chat',
+        {
+          message: text,
+          conversationId: conversationId || undefined,
+        },
+        { headers: accessToken ? { 'X-Conversation-Token': accessToken } : {} }
+      );
       setConversationId(data.data.conversationId);
+      if (data.data.accessToken) setAccessToken(data.data.accessToken);
       setMessages((prev) => [...prev, { id: Date.now() + 1, sender: 'BOT', content: data.data.botMessage.content }]);
       if (data.data.escalated) {
         setMessages((prev) => [...prev, {

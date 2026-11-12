@@ -5,6 +5,11 @@ const { AppError, asyncHandler } = require('../utils/helpers');
 const { RESOURCE_TYPES, ROLES } = require('../utils/constants');
 const { assertModuleAccessible } = require('../services/course.service');
 
+// Ruta física de un material. Acepta la ubicación privada actual y la anterior (/uploads/documents).
+function resourceFilePath(fileUrl) {
+  return path.join(__dirname, '..', String(fileUrl).replace(/^\/+/, ''));
+}
+
 // Resuelve el módulo de un curso. Sin moduleId se usa el Módulo 1.
 async function resolveModuleId(courseId, moduleId) {
   if (!courseId) return null;
@@ -83,7 +88,7 @@ exports.downloadResource = asyncHandler(async (req, res, next) => {
 
   if (!resource.fileUrl) throw new AppError('Este recurso no tiene archivo asociado.', 400);
 
-  const filePath = path.join(__dirname, '..', 'uploads', resource.fileUrl.replace('/uploads/', ''));
+  const filePath = resourceFilePath(resource.fileUrl);
   if (!fs.existsSync(filePath)) throw new AppError('El archivo ya no existe en el servidor.', 404);
 
   res.download(filePath);
@@ -132,7 +137,7 @@ exports.createResource = asyncHandler(async (req, res, next) => {
     description,
     type,
     externalUrl: type === 'ENLACE' ? externalUrl : null,
-    fileUrl: file ? `/uploads/documents/${file.filename}` : null,
+    fileUrl: file ? `/private-uploads/${file.filename}` : null,
     courseId: courseId ? Number(courseId) : null,
     moduleId: resolvedModuleId,
     uploadedBy: req.user.id,
@@ -171,7 +176,7 @@ exports.updateResource = asyncHandler(async (req, res, next) => {
     data.moduleId = await resolveModuleId(targetCourse, moduleId);
   }
   if (courseId !== undefined && !courseId) data.moduleId = null;
-  if (file) data.fileUrl = `/uploads/documents/${file.filename}`;
+  if (file) data.fileUrl = `/private-uploads/${file.filename}`;
 
   const resource = await prisma.resource.update({
     where: { id },
@@ -193,7 +198,7 @@ exports.deleteResource = asyncHandler(async (req, res, next) => {
 
   if (resource.fileUrl && process.env.NODE_ENV !== 'production') {
     const { unlink } = require('fs/promises');
-    const filePath = path.join(__dirname, '..', 'uploads', resource.fileUrl.replace('/uploads/', ''));
+    const filePath = resourceFilePath(resource.fileUrl);
     try {
       await unlink(filePath);
     } catch {

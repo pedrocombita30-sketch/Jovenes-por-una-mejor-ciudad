@@ -8,6 +8,17 @@ const {
   NOTIFICATION_TYPES,
 } = require('../utils/constants');
 
+// Solo el personal autorizado ve quién está inscrito. El público recibe la actividad sin participantes.
+const esPersonal = (req) => ['ADMIN', 'COLABORADOR'].includes(req.user?.role?.name);
+
+const sinParticipantes = (data) => {
+  const quitar = (a) => {
+    const { participants, ...resto } = a;
+    return resto;
+  };
+  return Array.isArray(data) ? data.map(quitar) : quitar(data);
+};
+
 exports.getActivities = asyncHandler(async (req, res, next) => {
   const { type, status, upcoming, search } = req.query;
 
@@ -42,7 +53,7 @@ exports.getActivities = asyncHandler(async (req, res, next) => {
     orderBy: { startDate: 'asc' },
   });
 
-  res.json({ success: true, data: activities });
+  res.json({ success: true, data: esPersonal(req) ? activities : sinParticipantes(activities) });
 });
 
 exports.getActivity = asyncHandler(async (req, res, next) => {
@@ -68,7 +79,7 @@ exports.getActivity = asyncHandler(async (req, res, next) => {
 
   if (!activity) throw new AppError('Actividad no encontrada.', 404);
 
-  res.json({ success: true, data: activity });
+  res.json({ success: true, data: esPersonal(req) ? activity : sinParticipantes(activity) });
 });
 
 exports.createActivity = asyncHandler(async (req, res, next) => {

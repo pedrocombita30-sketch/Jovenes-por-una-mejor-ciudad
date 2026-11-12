@@ -18,6 +18,11 @@ const { notFoundHandler, errorHandler } = require('./utils/helpers');
 
 const app = express();
 
+// Detrás de un proxy (p. ej. Render) hay que indicar cuántos saltos confiar para usar la IP real.
+if (process.env.TRUST_PROXY) {
+  app.set('trust proxy', /^\d+$/.test(process.env.TRUST_PROXY) ? Number(process.env.TRUST_PROXY) : process.env.TRUST_PROXY === 'true');
+}
+
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || '*',
@@ -27,7 +32,20 @@ app.use(
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Archivos públicos (imágenes y documentos corporativos). Los materiales de cursos NO están aquí:
+// se entregan con control de inscripción desde /api/resources/:id/download.
+app.use(
+  '/uploads',
+  express.static(path.join(__dirname, 'uploads'), {
+    setHeaders: (res, filePath) => {
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      // Un SVG abierto directamente no puede ejecutar scripts ni cargar recursos externos.
+      if (filePath.toLowerCase().endsWith('.svg')) {
+        res.setHeader('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; sandbox");
+      }
+    },
+  })
+);
 
 app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'API funcionando correctamente.' });

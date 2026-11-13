@@ -33,16 +33,22 @@ prisma.role
       process.exit(1);
     }
     const hashed = bcrypt.hashSync(password, 10);
-    return prisma.user.upsert({
-      where: { email },
-      update: { password: hashed, roleId: role.id, isActive: true },
-      create: {
-        email,
-        firstName,
-        lastName,
-        password: hashed,
-        roleId: role.id,
-      },
+    return prisma.user.findUnique({ where: { email }, include: { role: true } }).then((existing) => {
+      // Este script solo maneja administradores: nunca convierte en administrador a otra cuenta.
+      if (existing && existing.role.name !== 'ADMIN') {
+        throw new Error(`El correo ${email} pertenece a una cuenta de ${existing.role.name}. Este script solo administra administradores.`);
+      }
+      return prisma.user.upsert({
+        where: { email },
+        update: { password: hashed, isActive: true },
+        create: {
+          email,
+          firstName,
+          lastName,
+          password: hashed,
+          roleId: role.id,
+        },
+      });
     });
   })
   .then((user) => {

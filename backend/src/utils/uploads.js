@@ -1,15 +1,21 @@
 const path = require('path');
 
-// Archivos que el navegador puede ejecutar como página o script dentro del dominio del sitio.
-// Se rechazan aunque el nombre o el tipo MIME parezca válido.
-const DANGEROUS_EXT = /\.(html?|xhtml|xml|js|mjs|php|exe|bat|cmd|sh|ps1|jar)$/i;
+// Lista de tipos PERMITIDOS (no de prohibidos): cualquier extensión que no esté aquí se rechaza.
+const IMAGE_EXT = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg'];
+const DOCUMENT_EXT = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'csv', 'zip', 'rar', '7z'];
 
-// Filtro común de Multer: permite solo lo que ya estaba permitido, excluyendo tipos ejecutables.
-function isSafeUpload(file) {
-  const name = (file.originalname || '').toLowerCase();
-  if (DANGEROUS_EXT.test(name)) return false;
+const ALLOWED = {
+  image: IMAGE_EXT,
+  document: [...IMAGE_EXT, ...DOCUMENT_EXT],
+};
+
+// Filtro común de Multer. 'image' para imágenes; 'document' para documentos (incluye imágenes).
+function isAllowedUpload(file, kind = 'document') {
+  const ext = path.extname(file.originalname || '').slice(1).toLowerCase();
+  if (!ext || !ALLOWED[kind].includes(ext)) return false;
+  // Defensa adicional: nunca aceptar contenido declarado como HTML, aunque la extensión sea válida.
   if ((file.mimetype || '').toLowerCase() === 'text/html') return false;
-  return Boolean(path.extname(name));
+  return true;
 }
 
-module.exports = { isSafeUpload };
+module.exports = { isAllowedUpload, IMAGE_EXT, DOCUMENT_EXT };

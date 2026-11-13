@@ -39,9 +39,15 @@ app.use(
   express.static(path.join(__dirname, 'uploads'), {
     setHeaders: (res, filePath) => {
       res.setHeader('X-Content-Type-Options', 'nosniff');
+      const ext = path.extname(filePath).toLowerCase();
       // Un SVG abierto directamente no puede ejecutar scripts ni cargar recursos externos.
-      if (filePath.toLowerCase().endsWith('.svg')) {
+      if (ext === '.svg') {
         res.setHeader('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; sandbox");
+      }
+      // Imágenes y PDF se muestran en la página; cualquier otro archivo se descarga y no se renderiza.
+      const inline = ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg', '.pdf'];
+      if (!inline.includes(ext)) {
+        res.setHeader('Content-Disposition', 'attachment');
       }
     },
   })

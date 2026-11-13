@@ -2,7 +2,7 @@ const router = require('express').Router();
 const fs = require('fs');
 const multer = require('multer');
 const path = require('path');
-const { isSafeUpload } = require('../utils/uploads');
+const { isAllowedUpload } = require('../utils/uploads');
 const { protect, authorize } = require('../middleware/auth');
 const resourceCtrl = require('../controllers/resource.controller');
 const { validate, validators } = require('../middleware/validation');
@@ -24,10 +24,7 @@ const upload = multer({
   storage,
   limits: { fileSize: 20 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    const allowed = /pdf|doc|docx|ppt|pptx|xls|xlsx|txt|zip|rar|png|jpg|jpeg|svg|gif/;
-    const ext = allowed.test(path.extname(file.originalname).toLowerCase());
-    const mime = /application|text|image/.test(file.mimetype);
-    cb(null, (ext || mime) && isSafeUpload(file));
+    cb(null, isAllowedUpload(file, 'document'));
   },
 });
 

@@ -38,6 +38,11 @@ const errorHandler = (err, req, res, next) => {
     else message = `Error al subir el archivo: ${err.message}`;
   }
 
+  // Un error inesperado (base de datos, librerías) nunca expone su mensaje interno al visitante.
+  if (statusCode === 500 && !err.isOperational) {
+    message = 'Error interno del servidor.';
+  }
+
   if (statusCode === 500) {
     console.error('ERROR -', err);
   }
@@ -45,7 +50,8 @@ const errorHandler = (err, req, res, next) => {
   res.status(statusCode).json({
     success: false,
     message,
-    stack: process.env.NODE_ENV === 'production' ? undefined : err.stack,
+    // La traza solo se muestra en desarrollo. Si NODE_ENV no está definido, tampoco se muestra.
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
   });
 };
 

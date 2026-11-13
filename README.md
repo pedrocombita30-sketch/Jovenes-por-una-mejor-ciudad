@@ -144,6 +144,85 @@ datasource db {
 
 Y actualizar `DATABASE_URL` en `.env` (ej. `postgresql://user:pass@localhost:5432/jovenes_ciudad`), luego ejecutar `npx prisma migrate deploy`.
 
+## Despliegue en producción
+
+El repositorio contiene el código, pero **no** incluye la base de datos, los archivos subidos ni el archivo `.env`.
+Por eso un despliegue nuevo empieza vacío y necesita los pasos de esta sección, en este orden.
+Cada vez que se actualiza el código hay que repetir los pasos 2, 3 y 5; los pasos 4 (solo `db:seed`) se hacen una sola vez.
+
+### 1. Variables de entorno (en el panel del hosting)
+
+| Variable | Obligatoria | Descripción |
+|---|---|---|
+| `DATABASE_URL` | Sí | Ruta de la base. SQLite: `file:./dev.db` |
+| `JWT_SECRET` | Sí | Secreto largo y aleatorio (48 bytes o más). Generarlo con: `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"` |
+| `NODE_ENV` | Recomendada | `production`. Oculta las trazas de error |
+| `FRONTEND_URL` | Sí | URL pública del sitio, por ejemplo `https://fundacionjimc.org` |
+| `TRUST_PROXY` | Sí detrás de un proxy | `1` en Render y hostings similares. Sin esto, el límite de intentos cuenta a todos los visitantes como una sola IP |
+| `SEED_PASSWORD` | Solo para el seed | Contraseña de las cuentas de prueba que crea el seed. Usa una contraseña fuerte |
+| `OPENAI_API_KEY` | No | Opcional. Sin ella, el chatbot usa el modo de respuestas predefinidas |
+
+### 2. Instalación y build
+
+```bash
+cd backend && npm install && npx prisma generate
+cd ../frontend && npm install && npm run build
+```
+
+El build del frontend debe repetirse en cada despliegue. Si el servidor sirve una versión anterior de `frontend/dist`, las correcciones del sitio no se ven.
+
+### 3. Base de datos
+
+```bash
+cd backend
+npx prisma db push
+```
+
+Obligatorio en el primer despliegue y después de cada actualización que cambie el esquema. Sin este paso, el chat falla porque la columna del token no existe.
+
+### 4. Datos iniciales y migraciones
+
+```bash
+cd backend
+npm run db:seed                  # solo en el primer despliegue: roles, usuarios, contenido y chatbot
+npm run db:migrate:courses       # crea los 3 módulos de cada curso existente (se puede repetir)
+npm run db:migrate:private-files # mueve los materiales existentes a la carpeta privada (se puede repetir)
+```
+
+### 5. Iniciar el servidor
+
+```bash
+cd backend && npm start
+```
+
+El servidor crea solo las carpetas de subidas si no existen.
+
+### 6. Después del primer despliegue
+
+- **Cambia la contraseña de los administradores.** El seed crea las cuentas con `SEED_PASSWORD`. Para cambiar la contraseña de una cuenta existente, vuelve a ejecutar `node crear-usuario.js <correo> <nombre> <apellido> <nueva-contraseña>` (solo actualiza la contraseña de administradores).
+- Si tu base de datos ya existía antes de estos cambios, las cuentas creadas con la contraseña de desarrollo (`Admin123!`) siguen con esa contraseña hasta que las cambies.
+
+### Qué resuelve el código y qué depende de la configuración
+
+| Punto | Lo resuelve el código | Lo debe hacer quien despliega |
+|---|---|---|
+| Chat sin la columna del token | No | Paso 3 (`db push`) |
+| Límite de intentos compartido por el proxy | Sí, con `TRUST_PROXY` | Definir `TRUST_PROXY=1` |
+| Secreto de ejemplo | El servidor avisa si el secreto es débil | Definir `JWT_SECRET` |
+| Materiales de cursos públicos | Los archivos nuevos van a una carpeta privada | Paso 4 (`db:migrate:private-files`) |
+| Contraseñas predeterminadas | El seed usa `SEED_PASSWORD` y no imprime contraseñas | Cambiar las contraseñas de administrador |
+| Subidas de archivos peligrosos | Solo se aceptan los tipos de la lista permitida | Nada |
+| Archivos no imagen ni PDF se mostraban en el navegador | Se descargan | Nada |
+| Errores internos visibles para el visitante | Solo se muestra un mensaje genérico | `NODE_ENV=production` |
+| Notificaciones de otros usuarios | Solo se marcan las propias | Nada |
+| Historial del chatbot | Usa los 10 mensajes más recientes | Nada |
+
+### Lo que ningún cambio de código resuelve
+
+- **Datos ya expuestos antes de estos cambios:** los correos o nombres que se vieron públicamente no se pueden recuperar.
+- **Disco efímero:** en hostings que reinician el contenedor, la base SQLite y los archivos subidos se pierden en cada despliegue. Para producción conviene una base PostgreSQL y almacenamiento persistente.
+- **Límite de intentos en memoria:** se reinicia con cada despliegue y no se comparte si hay varias instancias del servidor.
+
 ## Cómo iniciar frontend y backend
 
 ### Backend (terminal 1)

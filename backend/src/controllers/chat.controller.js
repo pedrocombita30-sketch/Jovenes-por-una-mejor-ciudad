@@ -66,11 +66,14 @@ exports.sendMessage = asyncHandler(async (req, res, next) => {
     },
   });
 
-  const history = await prisma.message.findMany({
-    where: { conversationId: conversation.id },
-    orderBy: { createdAt: 'asc' },
-    take: 10,
-  });
+  // Los 10 mensajes MÁS RECIENTES (incluido el que acaba de llegar), en orden cronológico para la IA.
+  const history = (
+    await prisma.message.findMany({
+      where: { conversationId: conversation.id },
+      orderBy: { id: 'desc' },
+      take: 10,
+    })
+  ).reverse();
 
   const { answer, usedMock, escalate } = await generateResponse(message, history);
 

@@ -1,5 +1,5 @@
 const prisma = require('../config/database');
-const { asyncHandler } = require('../utils/helpers');
+const { AppError, asyncHandler } = require('../utils/helpers');
 
 exports.getMyNotifications = asyncHandler(async (req, res, next) => {
   const notifications = await prisma.notification.findMany({
@@ -14,10 +14,12 @@ exports.getMyNotifications = asyncHandler(async (req, res, next) => {
 exports.markAsRead = asyncHandler(async (req, res, next) => {
   const id = Number(req.params.id);
 
-  await prisma.notification.update({
-    where: { id },
+  // Solo se pueden marcar notificaciones propias. Una ajena se trata como inexistente (404).
+  const result = await prisma.notification.updateMany({
+    where: { id, userId: req.user.id },
     data: { isRead: true },
   });
+  if (result.count === 0) throw new AppError('Notificación no encontrada.', 404);
 
   res.json({ success: true, message: 'Notificación marcada como leída.' });
 });
